@@ -1,0 +1,395 @@
+# HP data script for F-POD and C-POD diel monthly plots
+# Author: Chloe Robinson
+
+library(ggplot2) #for creating graphs
+library(gridExtra) #for exporting figure panels
+library(ggpubr) #for annotating plots
+library(plyr) #for annotating figures
+
+#read in data
+
+hp <- read.csv(("FPOD_DPM_PER_MONTH.csv"),stringsAsFactors = FALSE)
+attach(hp)
+str(hp)
+
+
+# Plot January
+
+#create dataframes with the x min and max to colour for night and evening/night and morning 
+shade <- data.frame(xmin = c(1,17),xmax = c(8,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(8, 16),xmax = c(9,17),ymin = - Inf, ymax = Inf)
+
+
+jan <-subset(hp,Month %in% c("January"))
+
+plot1 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=jan, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("January")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot1
+
+# Plot February
+
+shade <- data.frame(xmin = c(1,17.5),xmax = c(7.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(7.5, 16.5),xmax = c(8.5,17.5),ymin = - Inf, ymax = Inf)
+
+feb <-subset(hp,Month %in% c("February"))
+
+plot2 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=feb, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("February")+
+  ylab("Harbour Porpoise Mean DPM")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot2
+
+# Plot March
+
+shade <- data.frame(xmin = c(1,19),xmax = c(6,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(6, 18),xmax = c(7,19),ymin = - Inf, ymax = Inf)
+
+mar <-subset(hp,Month %in% c("March"))
+
+plot3 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=mar, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("March")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot3
+
+
+# Plot April
+
+shade <- data.frame(xmin = c(1,19.5),xmax = c(5.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(5.5, 18.5),xmax = c(6.5,19.5),ymin = - Inf, ymax = Inf)
+
+apr <-subset(hp,Month %in% c("April"))
+
+plot4 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=apr, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("April")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot4
+
+
+# Plot May
+
+shade <- data.frame(xmin = c(1,20),xmax = c(5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(5, 19),xmax = c(6,20),ymin = - Inf, ymax = Inf)
+
+may <-subset(hp,Month %in% c("May"))
+
+plot5 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=may, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("May")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot5
+
+# Plot June
+
+shade <- data.frame(xmin = c(1,20.5),xmax = c(4.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(4.5, 19.5),xmax = c(5.5,20.5),ymin = - Inf, ymax = Inf)
+
+jun <-subset(hp,Month %in% c("June"))
+
+plot6 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=jun, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("June")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot6
+
+
+# Plot July
+
+shade <- data.frame(xmin = c(1,20.5),xmax = c(4.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(4.5, 19.5),xmax = c(5.5,20.5),ymin = - Inf, ymax = Inf)
+
+jul <-subset(hp,Month %in% c("July"))
+
+plot7 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=jul, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("July")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot7
+
+# Plot August
+
+shade <- data.frame(xmin = c(1,20),xmax = c(5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(5, 19.0),xmax = c(6,20),ymin = - Inf, ymax = Inf)
+
+aug <-subset(hp,Month %in% c("August"))
+
+plot8 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=aug, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("August")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot8
+
+# Plot September
+
+shade <- data.frame(xmin = c(1,20),xmax = c(6,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(6, 19.0),xmax = c(7,20),ymin = - Inf, ymax = Inf)
+
+sep <-subset(hp,Month %in% c("September"))
+
+plot9 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=sep, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("September")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot9
+
+
+# Plot October
+
+shade <- data.frame(xmin = c(1,19),xmax = c(7.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(7.5, 18),xmax = c(8.5,19),ymin = - Inf, ymax = Inf)
+
+oct <-subset(hp,Month %in% c("October"))
+
+plot10 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=oct, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("October")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot10
+
+# Plot November
+
+shade <- data.frame(xmin = c(1,17.5),xmax = c(7.5,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(7.5, 16.5),xmax = c(8.5,17.5),ymin = - Inf, ymax = Inf)
+
+nov <-subset(hp,Month %in% c("November"))
+
+plot11 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=nov, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("November")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot11
+
+# Plot December
+
+shade <- data.frame(xmin = c(1,17),xmax = c(8,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(8, 16),xmax = c(9,17),ymin = - Inf, ymax = Inf)
+
+dec <-subset(hp,Month %in% c("December"))
+
+plot12 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=dec, aes(x=Hour, y=DPM_HR)) +
+  ggtitle("December")+
+  theme_bw()+
+  theme(
+    plot.title = element_text(size=12),
+    axis.text.x = element_text(size=8),
+    axis.text.y = element_text(size=8),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 24), breaks = c(1,3, 5, 7,9,11,13,15,17,19,21,23),
+                     labels=c(1,3, 5, 7,9,11,13,15,17,19,21,23))
+
+plot12
+
+#arrange plots on a grid
+plots<-grid.arrange(plot1,plot2,plot3,plot4, plot5, plot6, plot7,plot8,plot9,plot10,plot11,plot12, ncol=4, nrow=3)
+plots
+
+#annotate plots to add axis labels
+plots2<-annotate_figure(plots, bottom = text_grob("Hour", color = "black",
+                                                  size = 12, face="bold"),
+                        left = text_grob("Harbour Porpoise DPM/hr", color = "black", rot = 90, size=12, face="bold"),)
+
+plots2
+
+#save plot
+ggsave("Figure5_monthly_diel.tiff", plots2, dpi=800)
