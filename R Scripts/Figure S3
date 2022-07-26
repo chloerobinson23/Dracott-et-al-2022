@@ -1,0 +1,116 @@
+# HP data script for F-POD plots against environmental variables
+# Author: Chloe Robinson
+
+library(ggplot2)# for creating graphs
+library(gridExtra)#for exporting figure panels
+library(ggpubr)#for annotating plots
+
+
+#read in data
+
+hp <- read.csv(("FPOD_DPM_H.csv"),stringsAsFactors = FALSE)
+attach(hp)
+
+
+colors <- c("CA_2020" = "green", "CA_2021" = "green", "PS_2020" = "black", "PS_2021"="black")
+
+
+# Basic scatter plot for DPM by CA averaged over month for 2020
+plot1 <- ggplot()+
+  geom_line(data=hp,aes(x=CA_2020, y=DPM_perH_2020, color="darkgreen"))+
+  scale_color_identity(guide = "legend", name="Sample Year",labels = c("2020"))+
+  geom_ribbon(aes(x = CA_2020, ymin=DPM_perH_2020+0.5, ymax=DPM_perH_2020-0.5), alpha=0.1,  
+              color = "black", linetype = "dotted")+
+  ggtitle("2020")+
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(size=12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size=12),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(1, 6.5), breaks = c(1,2,3,4,5,6.5))
+
+plot1
+
+
+
+# Basic scatter plot for DPM by CA averaged over month for 2021
+plot2 <- ggplot()+
+  geom_line(data=hp,aes(x=CA_2021, y=DPM_perH_2021, color="darkgreen"))+
+  scale_color_identity(guide = "legend", name="Sample Year",labels = c("2021"))+
+  geom_ribbon(aes(x = CA_2021, ymin=DPM_perH_2021+0.5, ymax=DPM_perH_2021-0.5), alpha=0.1,  
+              color = "black", linetype = "dotted")+
+  ggtitle("2021")+
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(size=12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size=12),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(0, 7.5), breaks = c(0,1,2,3,4,5,6,7.5))
+
+plot2
+
+# Basic scatter plot for DPM by PS averaged over month for 2020
+plot3 <- ggplot()+
+  geom_line(data=hp,aes(x=PS_2020, y=DPM_perH_2020, color="black"))+
+  scale_color_identity(guide = "legend", name="Sample Year",labels = c("2020"))+
+  geom_ribbon(aes(x = PS_2020, ymin=DPM_perH_2020+0.5, ymax=DPM_perH_2020-0.5), alpha=0.1,  
+              color = "black", linetype = "dotted")+
+  ggtitle("2020")+
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(size=12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size=12),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(20.5, 29.5), breaks = c(20.5,21,22,23,24,25,26,27,28,29,29.5))
+
+plot3
+
+
+# Basic scatter plot for DPM by PS averaged over month for 2021
+plot4 <- ggplot()+
+  geom_line(data=hp,aes(x=PS_2021, y=DPM_perH_2021, color="black"))+
+  scale_color_identity(guide = "legend", name="Sample Year",labels = c("2021"))+
+  geom_ribbon(aes(x = PS_2021, ymin=DPM_perH_2021+0.5, ymax=DPM_perH_2021-0.5), alpha=0.1,  
+              color = "black", linetype = "dotted")+
+  ggtitle("2021")+
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(size=12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size=12),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    legend.text = element_blank(),
+    legend.title = element_blank(),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(limits=c(21.5, 29), breaks = c(21.5,22,23,24,25,26,27,28,29,29))
+
+plot4
+
+#arrange plots on a grid
+plots<-grid.arrange(plot1,plot3,plot2,plot4, ncol=2, nrow=2)
+
+#annotate plots to add axis labels
+plots2<-annotate_figure(plots, bottom = text_grob("Mean Chlorophyll A (µg/L)                                                       Mean Practical Salinity (PSU)", color = "black",
+                                                 hjust = 0.5, size = 12, face="bold"),
+                        left = text_grob("Harbour Porpoise DPM/hr", color = "black", rot = 90, size=12, face="bold"),)
+
+plots2
+
+#save plot
+ggsave("FigureS3_CA_PS_monthly.tiff", plots2, dpi=600)
