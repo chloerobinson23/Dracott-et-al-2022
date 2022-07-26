@@ -1,0 +1,46 @@
+# HP data script for F-POD and C-POD plots
+# Author: Chloe Robinson
+
+library(ggplot2)  # for creating graphs
+
+hp2 <- read.csv(("FPOD_DPM_daily.csv"),stringsAsFactors = FALSE)
+attach(hp2)
+
+
+#create dataframes with the x min and max to colour for night and evening/night and morning
+shade <- data.frame(xmin = c(1, 21),xmax = c(6,24),ymin = - Inf, ymax = Inf)
+shade2 <- data.frame(xmin = c(6, 20),xmax = c(7,21),ymin = - Inf, ymax = Inf)
+
+
+# Basic scatter plot for DPM by month (make sure to plot geom_rect before the geom_line and ribbon)
+plot2 <- ggplot()+
+  geom_rect(data = shade, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'gray30', alpha = 0.4) +
+  geom_rect(data = shade2, inherit.aes = FALSE,mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = 'grey69', alpha = 0.5) +
+  geom_line(data=hp2, aes(x=Hour, y=Av_DPM_2020, color = "black")) +
+  geom_line(data=hp2, aes(x=Hour, y=Av_DPM_2021, color = "red")) +
+  scale_color_identity(guide = "legend", name="Sample Year",labels = c("2020", "2021"))+
+  geom_ribbon(data = hp2,aes(x = Hour, ymin=Av_DPM_2020+0.5, ymax=Av_DPM_2020-0.5), alpha=0.1,  
+              color = "black", linetype = "dotted")+
+  geom_ribbon(data=hp2,aes(x = Hour, ymin=Av_DPM_2021+0.5, ymax=Av_DPM_2021-0.5), alpha=0.1,  
+              color = "red", linetype = "dotted")+
+  ylab("Harbour Porpoise Mean DPM")+
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(size=12),
+    axis.text.y = element_text(size=12),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face="bold"),
+    legend.position = "right",
+    legend.text = element_text(size = 12, colour = "black"),
+    legend.title = element_text(size=12),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(name="Hour", limits=c(1, 24), breaks = c(1,2,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24),
+                     labels=c(1,2,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24))
+
+plot2
+
+#save plot
+
+ggsave("Figure 4_DPM_daily.tiff", plot2, dpi=600)
