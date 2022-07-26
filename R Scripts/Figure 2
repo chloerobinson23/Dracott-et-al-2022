@@ -1,0 +1,227 @@
+# HP GAM model
+# Author: Chloe Robinson
+
+library(mgcv) #bam() function for models
+library(car) #vif() function
+
+#read in data
+
+hp <- read.csv(("FPOD_DPM_model_data.csv"), stringsAsFactors =TRUE, na.strings = c(""))
+attach(hp)
+str(hp)
+
+
+#VIF testing
+
+testmodel1<- lm(DPM~Month + Hour + Av.Chlorophyll + Av.Salinity + Av.SeaLevel + Av.Temp + Av.Turbidity
+               + DiurnalPhase + MoonPhase, data = hp)
+summary(testmodel1)
+
+#test vif
+vif(testmodel1)
+
+                    #GVIF Df GVIF^(1/(2*Df))
+#Month          1.454255  1        1.205925
+#Hour           6.890830  1        2.625039
+#Av.Chlorophyll 1.082636  1        1.040498
+#Av.Salinity    1.655162  1        1.286531
+#Av.SeaLevel    1.003427  1        1.001712
+#Av.Temp        2.113499  1        1.453788
+#Av.Turbidity   1.150262  1        1.072502
+#DiurnalPhase   7.383631  4        1.283908
+#MoonPhase      1.041616  7        1.002917
+
+## Use GVIF^(1/2) to make comparable to other vif estimates
+## none above 5 so nothing to drop
+
+### TESTS FOR AUTOCORRELATION
+
+#run a base model - without autocorrelation
+
+hpbambase<- bam(DPM~s(Month, bs="cc", k=12) + s(Hour, bs="cc",k=24)+s(Av.Temp, bs="cc", k=6) +s(Av.Chlorophyll, bs="cc", k=6) 
+                +s(Av.Turbidity, bs="cs",k=6) + s(Av.Salinity, bs="cc", k=6) +s(Av.SeaLevel,bs="cs", k=6) 
+                +as.factor(DiurnalPhase) +(MoonPhase) +as.factor(SampleYear), data=hp, family=negbin(0.1))
+#inspect correlation
+par(mfrow=c(1,1), cex=1.1)
+
+
+# default ACF function:
+acf(resid(hpbambase), main="acf(resid(hpbambase))")
+
+#Determine the value of lag 1, as indicated by the red dot in the picture below:
+# we also ask to plot the ACF by specifying plot (FALSE by default):
+r1hp <- start_value_rho(hpbambase, plot=TRUE)
+
+#this gives the r1 value
+acf(resid(hpbambase), plot=FALSE)$acf[2]
+#r1 =0.166
+
+###below 0.2 so so issues! IGNORE BELOW FOR NOW UNTIL CHECKED
+
+
+##### MODELLING TIME!
+
+#model1
+
+model1<-bam(DPM~s(Month, bs="cs", k=12) + +s(Hour, bs="cs", k=24)+ s(Av.Temp, bs="cs",k=10)+s(Av.Chlorophyll, bs="cs", k=10) 
+            +s(Av.Turbidity, bs="cs",k=10) + s(Av.Salinity, bs="cs", k=10) +s(Av.SeaLevel,bs="cs", k=10) 
+            +as.factor(DiurnalPhase) +as.factor(MoonPhase) +as.factor(SampleYear), data=hp, family=nb)
+summary(model1)
+
+#Parametric coefficients:
+                                #Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)                     0.770325   0.102162   7.540 4.93e-14 ***
+  #as.factor(DiurnalPhase)Evening  0.458952   0.087076   5.271 1.38e-07 ***
+  #as.factor(DiurnalPhase)Morning -0.509432   0.108187  -4.709 2.51e-06 ***
+  #as.factor(DiurnalPhase)Night1  -0.215448   0.126942  -1.697   0.0897 .  
+  #as.factor(DiurnalPhase)Night2   0.879322   0.094035   9.351  < 2e-16 ***
+  #MoonPhaseFQ                    -0.034589   0.124171  -0.279   0.7806    
+  #MoonPhaseLQ                     0.210699   0.125858   1.674   0.0941 .  
+  #MoonPhaseNM                     0.087391   0.125728   0.695   0.4870    
+  #MoonPhaseWNC                    0.004384   0.094672   0.046   0.9631    
+  #MoonPhaseWNG                    0.140930   0.094372   1.493   0.1354    
+  #MoonPhaseWXC                    0.020231   0.095099   0.213   0.8315    
+  #MoonPhaseWXG                   -0.132430   0.094535  -1.401   0.1613    
+  #as.factor(SampleYear)2021      -0.339494   0.043392  -7.824 5.42e-15 ***
+  #---
+  #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Approximate significance of smooth terms:
+                    #edf Ref.df      F p-value    
+  #s(Month)          1.016e+01     11 30.501  <2e-16 ***
+  #s(Hour)           1.002e+01     23 11.537  <2e-16 ***
+  #s(Av.Temp)        5.502e+00      9  6.486  <2e-16 ***
+  #s(Av.Chlorophyll) 8.296e+00      9  9.402  <2e-16 ***
+  #s(Av.Turbidity)   1.243e-04      9  0.000   0.939    
+  #s(Av.Salinity)    1.885e+00      9  4.866  <2e-16 ***
+  #s(Av.SeaLevel)    1.915e-04      9  0.000   0.958    
+#---
+  #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#R-sq.(adj) =  0.168   Deviance explained = 14.8%
+#fREML =  25047  Scale est. = 1         n = 17204
+
+##remove observations with missing values of Av.sealevel, turbidity and moonphase
+hp2 <-hp[!is.na(hp$Av.SeaLevel),]
+hp2 <-hp2[!is.na(hp2$Av.Turbidity),]
+hp2 <-hp2[!is.na(hp2$MoonPhase),]
+
+#model2 (drop sea level, turbidity and moonphase)
+
+model2<-bam(DPM~s(Month, bs="cs", k=12) + +s(Hour, bs="cs",k=24) + s(Av.Chlorophyll, bs="cs", k=10)
+            +s(Av.Salinity, bs="cs", k=10)+as.factor(DiurnalPhase) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model2)
+
+#Parametric coefficients:
+                              #Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)                     0.82146    0.05555  14.789  < 2e-16 ***
+  #as.factor(DiurnalPhase)Evening  0.45734    0.08725   5.242 1.61e-07 ***
+  #as.factor(DiurnalPhase)Morning -0.52383    0.10840  -4.832 1.36e-06 ***
+  #as.factor(DiurnalPhase)Night1  -0.21999    0.12719  -1.730   0.0837 .  
+  #as.factor(DiurnalPhase)Night2   0.85406    0.09430   9.057  < 2e-16 ***
+  #as.factor(SampleYear)2021      -0.37630    0.04068  -9.251  < 2e-16 ***
+  #---
+  #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Approximate significance of smooth terms:
+                #edf Ref.df      F p-value    
+  #s(Month)          10.375     11 64.598  <2e-16 ***
+  #s(Hour)           10.014     23 11.355  <2e-16 ***
+  #s(Av.Chlorophyll)  8.472      9 11.556  <2e-16 ***
+  #s(Av.Salinity)     2.421      9  4.422  <2e-16 ***
+  #---
+  #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#R-sq.(adj) =  0.151   Deviance explained = 14.3%
+#fREML =  25044  Scale est. = 1         n = 17204
+
+
+#run AICs between 2 models
+AIC(model1,model2)
+
+            #df      AIC
+#model1 52.39627 60009.69
+#model2 40.31295 60074.84
+
+
+#AIC for model1 marginally smaller but contains non-sig variables. Stick with model2
+
+#plotting final HP DPM model
+plot(model2,pages=1,all.terms=TRUE,ylim=c(-2, 2), shade=T,
+     cex.axis=0.9, cex.lab=1.5, se=TRUE)
+
+##difference in explained deviance
+1-(model1$dev/model1$null)
+#0.1482228
+
+##difference in explained deviance
+1-(model2$dev/model2$null)
+#0.1425245
+
+
+#perform anova to compare models (start with model with least variables)
+anova(model2, model1, test="Chisq")
+
+      #Resid. Df Resid. Dev       Df Deviance  Pr(>Chi)    
+#1     17162      59994                              
+#2     17148      59905 13.357   89.314 2.708e-13 ***
+#---
+  #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+ ### reject null hypothesis that all models are the same 
+### despite model1 having lower AIC and resid. it is negligible
+
+### export the plot
+########################
+## AIC table
+#######################
+
+#run model 3 as if carrying on from model 2, removing the vars that we know are signif
+#remove month first
+
+model3<-bam(DPM~s(Hour, bs="cs",k=24) + s(Av.Chlorophyll, bs="cs", k=10)
+            +s(Av.Salinity, bs="cs", k=10)+as.factor(DiurnalPhase) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model3)
+
+#now remove hour and add month back in 
+
+model4<-bam(DPM~s(Month, bs="cs",k=12) + s(Av.Chlorophyll, bs="cs", k=10)
+            +s(Av.Salinity, bs="cs", k=10)+as.factor(DiurnalPhase) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model4)
+
+#now remove av.chlorophyll and add hour back in 
+
+model5<-bam(DPM~s(Month, bs="cs",k=12) + s(Hour, bs="cs", k=24)
+            +s(Av.Salinity, bs="cs", k=10)+as.factor(DiurnalPhase) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model5)
+
+#now remove av.salinity and add av. chlorophyll back in 
+
+model6<-bam(DPM~s(Month, bs="cs",k=12) + s(Hour, bs="cs", k=24)
+            +s(Av.Chlorophyll, bs="cs", k=10)+as.factor(DiurnalPhase) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model6)
+
+#now remove diurnal phase and add av. salinity back in 
+
+model7<-bam(DPM~s(Month, bs="cs",k=12) + s(Hour, bs="cs", k=24)
+            +s(Av.Chlorophyll, bs="cs", k=10)+ s(Av.Salinity, bs="cs", k=10) +as.factor(SampleYear), data=hp2, family=nb)
+summary(model7)
+
+#now remove sampleyear and add dirunalphase back in 
+
+model8<-bam(DPM~s(Month, bs="cs",k=12) + s(Hour, bs="cs", k=24)
+            +s(Av.Chlorophyll, bs="cs", k=10)+ s(Av.Salinity, bs="cs", k=10) +as.factor(DiurnalPhase), data=hp2, family=nb)
+summary(model8)
+
+#run AICs
+AIC(model3,model4, model5,model6,model7,model8)
+#df   AIC 
+#model3 32.33119 60733.97
+#model4 30.05290 60291.29
+#model5 36.60247 60182.18
+#model6 37.77807 60103.50
+#model7 36.60247 60182.18
+#model8 40.59192 60148.77
+
+#######################################################################################
